@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-public class ECommerceDbContext : DbContext
+public class ECommerceDbContext(DbContextOptions<ECommerceDbContext> options) : DbContext(options)
 {
-    public ECommerceDbContext(DbContextOptions<ECommerceDbContext> options)
-        : base(options)
-    {
-    }
-
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
 

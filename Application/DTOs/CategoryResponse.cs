@@ -1,9 +1,7 @@
 ﻿namespace Application.DTOs;
 
-public class ProductResponse
+public class CategoryResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
-    public decimal BasePrice { get; set; }
-    public Guid CategoryId { get; set; }
 }

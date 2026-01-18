@@ -16,4 +16,15 @@ public class ProductsController(IProductService productService) : ControllerBase
         var id = await _productService.CreateAsync(request);
         return Ok(id);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 10,
+    [FromQuery] Guid? categoryId = null)
+    {
+        var result = await _productService.GetAllAsync(page, pageSize, categoryId);
+        return Ok(result);
+    }
+
 }

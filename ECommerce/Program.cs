@@ -1,5 +1,9 @@
 using Application.Services;
 using Infrastructure;
+using FluentValidation;
+using Application.Validators;
+using FluentValidation.AspNetCore;
+using ECommerce.API.Middleware;
 
 namespace ECommerce.API;
 
@@ -12,6 +16,11 @@ public class Program
         // Add services to the container.
 
         builder.Services.AddControllers();
+        //builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+        builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>();
+        builder.Services.AddFluentValidationAutoValidation();
+
+
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
@@ -34,6 +43,7 @@ public class Program
 
         app.UseAuthorization();
 
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
 

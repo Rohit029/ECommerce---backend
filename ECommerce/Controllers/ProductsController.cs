@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECommerce.API.Controllers;
@@ -10,6 +11,7 @@ public class ProductsController(IProductService productService) : ControllerBase
 {
     private readonly IProductService _productService = productService;
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateProductRequest request)
     {

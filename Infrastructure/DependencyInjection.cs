@@ -1,6 +1,8 @@
 ﻿using Application.Repositories;
+using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,9 @@ public static class DependencyInjection
 
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;
     }

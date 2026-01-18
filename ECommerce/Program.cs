@@ -4,6 +4,9 @@ using FluentValidation;
 using Application.Validators;
 using FluentValidation.AspNetCore;
 using ECommerce.API.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ECommerce.API;
 
@@ -15,6 +18,23 @@ public class Program
 
         // Add services to the container.
 
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!)
+            )
+        };
+    });
+
         builder.Services.AddControllers();
         //builder.Services.AddValidatorsFromAssemblyContaining<Program>();
         builder.Services.AddValidatorsFromAssemblyContaining<CreateCategoryRequestValidator>();
@@ -23,12 +43,39 @@ public class Program
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Description = "Enter JWT token like: Bearer {your token}"
+            });
+
+            options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+        {
+            {
+                new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                {
+                    Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                    {
+                        Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
+            });
+
 
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddScoped<IProductService, ProductService>();
         builder.Services.AddScoped<ICategoryService, CategoryService>();
-
+        builder.Services.AddScoped<IAuthService, AuthService>();
 
         var app = builder.Build();
 
@@ -40,7 +87,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseMiddleware<ExceptionMiddleware>();

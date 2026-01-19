@@ -5,21 +5,14 @@ using Domain.Enums;
 
 namespace Application.Services;
 
-public class AuthService : IAuthService
+public class AuthService(
+    IUserRepository userRepo,
+    IPasswordHasher hasher,
+    IJwtTokenGenerator jwt) : IAuthService
 {
-    private readonly IUserRepository _userRepo;
-    private readonly IPasswordHasher _hasher;
-    private readonly IJwtTokenGenerator _jwt;
-
-    public AuthService(
-        IUserRepository userRepo,
-        IPasswordHasher hasher,
-        IJwtTokenGenerator jwt)
-    {
-        _userRepo = userRepo;
-        _hasher = hasher;
-        _jwt = jwt;
-    }
+    private readonly IUserRepository _userRepo = userRepo;
+    private readonly IPasswordHasher _hasher = hasher;
+    private readonly IJwtTokenGenerator _jwt = jwt;
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {

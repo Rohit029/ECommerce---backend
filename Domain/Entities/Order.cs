@@ -7,6 +7,7 @@ public class Order : BaseEntity
     public Guid UserId { get; private set; }
     public OrderStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
+    public List<OrderItem> Items { get; private set; } = new();
 
     private Order() { }
 
@@ -17,16 +18,22 @@ public class Order : BaseEntity
         TotalAmount = 0;
     }
 
+    public void AddItem(Guid productId, int quantity, decimal price)
+    {
+        Items.Add(new OrderItem(productId, quantity, price));
+        RecalculateTotal();
+    }
+
     public void MarkAsPaid()
     {
         Status = OrderStatus.Paid;
     }
 
-    public void SetTotalAmount(decimal amount)
+    private void RecalculateTotal()
     {
-        if (amount <= 0)
-            throw new ArgumentException("Total amount must be greater than zero");
+        TotalAmount = Items.Sum(i => i.Price * i.Quantity);
 
-        TotalAmount = amount;
+        if (TotalAmount <= 0)
+            throw new InvalidOperationException("Order total must be greater than zero");
     }
 }

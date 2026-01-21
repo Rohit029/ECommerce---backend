@@ -15,12 +15,11 @@ public class Order : BaseEntity
     {
         UserId = userId;
         Status = OrderStatus.Pending;
-        TotalAmount = 0;
     }
 
     public void AddItem(Guid productId, int quantity, decimal price)
     {
-        Items.Add(new OrderItem(productId, quantity, price));
+        Items.Add(new OrderItem(Id, productId, quantity, price));
         RecalculateTotal();
     }
 

@@ -12,15 +12,21 @@ public class Cart : BaseEntity
         UserId = userId;
     }
 
-    public void AddItem(Guid productId, int quantity)
+    public CartItem AddItem(Guid productId, int quantity)
     {
         var existing = Items.FirstOrDefault(x => x.ProductId == productId);
 
         if (existing != null)
+        {
             existing.Increase(quantity);
-        else
-            Items.Add(new CartItem(productId, quantity));
+            return existing;
+        }
+
+        var item = new CartItem(Id, productId, quantity);
+        Items.Add(item);
+        return item;
     }
+
 
     public void RemoveItem(Guid productId)
     {

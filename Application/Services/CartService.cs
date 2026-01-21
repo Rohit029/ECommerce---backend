@@ -14,15 +14,19 @@ public class CartService(ICartRepository cartRepo) : ICartService
         if (cart == null)
         {
             cart = new Cart(userId);
-            cart.AddItem(productId, quantity);
-            await _cartRepo.AddAsync(cart);
+            var item = cart.AddItem(productId, quantity);
+            await _cartRepo.AddAsync(cart); // Cart + items inserted
+            return;
         }
-        else
-        {
-            cart.AddItem(productId, quantity);
-            await _cartRepo.UpdateAsync(cart);
-        }
+
+        var newItem = cart.AddItem(productId, quantity);
+
+        // 🔥 THIS IS THE FIX
+        _cartRepo.AddCartItemIfNew(newItem);
+
+        await _cartRepo.SaveChangesAsync();
     }
+
 
     public async Task<Cart> GetCartAsync(Guid userId)
     {

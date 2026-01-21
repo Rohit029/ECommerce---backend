@@ -21,9 +21,22 @@ public class CartRepository(ECommerceDbContext context) : ICartRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Cart cart)
+    //public async Task UpdateAsync(Cart cart)
+    //{
+    //    _context.Carts.Update(cart);
+    //    await _context.SaveChangesAsync();
+    //}
+
+    public void AddCartItemIfNew(CartItem item)
     {
-        _context.Carts.Update(cart);
+        if (_context.Entry(item).State == EntityState.Detached)
+        {
+            _context.CartItems.Add(item);
+        }
+    }
+
+    public async Task SaveChangesAsync()
+    {
         await _context.SaveChangesAsync();
     }
 
